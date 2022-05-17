@@ -4,6 +4,11 @@ const authRouter = require('./src/routes/auth');
 const app = express();
 const PORT = process.env.PORT || 5555;
 const cors = require('cors');
+const { createServer } = require("http");
+const { Server } = require('socket.io');
+const httpServer = createServer(app);
+const io = new Server(httpServer);
+
 
 
 app.use(bodyParser.json());
