@@ -18,13 +18,13 @@ router.post('/signup', async (req, res) => {
     const { login, password } = req.body;
 
     if(!login || !password) {
-        return res.status(400).send('bad request');
+        return res.status(400).json({message: "bad request"});
     }
     const hash = await getHash(password);
     const check = await User.findOne({ where: { login: login } });
 
     if(check) {
-        return res.status(400).send('Login already used');
+        return res.status(400).json({message: "Login already used"});
     }
     await User.create({
         login: login,
@@ -38,7 +38,7 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { login, password } = req.body;
     if(!login || !password) {
-        return res.status(400).send('bad request');
+        return res.status(400).json({message: "bad request"});
     }
     const user = await User.findOne({
         where: {
