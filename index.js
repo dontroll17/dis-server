@@ -10,9 +10,10 @@ const { createServer } = require("http");
 const { Server } = require('socket.io');
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-    allowRequest: (req, callback) => {
-        const noOriginHeader = req.headers.origin === undefined;
-        callback(null, noOriginHeader);
+    allowEIO3: true,
+    cors: {
+        origin: "http://localhost:3000",
+        credentials: true
     }
 });
 
@@ -25,6 +26,6 @@ app.use(bodyParser.urlencoded( {extended: true }));
 app.use(cors());
 app.use('/auth',authRouter);
 
-app.listen(PORT,  () => {
+httpServer.listen(PORT,  () => {
     console.log(`Blast-off on http://localhost:${PORT} pid:${process.pid}`);
 });
