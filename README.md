@@ -1,1 +1,4 @@
-# У кого-то большая голова
+# Server
+
+## "start": "node index.js",
+## "dev": "nodemon index.js"
