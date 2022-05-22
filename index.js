@@ -40,12 +40,12 @@ io.use(function(socket, next){
 //Соединение пользователей онлайн и обработчики событий
 io.on(CONNECT, (socket) => {
     socketUsers[socket.id] = jwtUser;
-    socket.emit(SOCKET_USERS_CHANGES, socketUsers);
+    io.emit(SOCKET_USERS_CHANGES, socketUsers);
 
     //Разрыв соединения сокета и удаления пользователя из списка онлайн
     socket.on(DISCONNECT, () => {
         delete socketUsers[socket.id];
-        socket.emit(SOCKET_USERS_CHANGES, socketUsers);
+        io.emit(SOCKET_USERS_CHANGES, socketUsers);
     });
 });
 
