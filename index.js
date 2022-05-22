@@ -7,7 +7,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
 //Константы
-const {CONNECT, DISCONNECT, SOCKET_USERS_CHANGES} = require("./src/constants/socketEvents");
+const {CONNECT, DISCONNECT, SOCKET_USERS_CHANGES, INVITE_USER} = require("./src/constants/socketEvents");
 
 //socket.io инициация
 const { createServer } = require("http");
@@ -41,6 +41,12 @@ io.use(function(socket, next){
 io.on(CONNECT, (socket) => {
     socketUsers[socket.id] = jwtUser;
     io.emit(SOCKET_USERS_CHANGES, socketUsers);
+
+    socket.on(INVITE_USER, (userId) => {
+        let val = Object.values(socketUsers).find((user) => user.id === userId);
+        const client = Object.keys(socketUsers).find(key => socketUsers[key] === val);
+        socket.to(client).emit('hi')
+    })
 
     //Разрыв соединения сокета и удаления пользователя из списка онлайн
     socket.on(DISCONNECT, () => {
