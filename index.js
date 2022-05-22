@@ -4,9 +4,12 @@ const authRouter = require('./src/routes/auth');
 const app = express();
 const PORT = process.env.PORT || 5555;
 const cors = require('cors');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
-//socket.io init
+//Константы
+const {CONNECT, DISCONNECT, SOCKET_USERS_CHANGES} = require("./src/constants/socketEvents");
+
+//socket.io инициация
 const { createServer } = require("http");
 const { Server } = require('socket.io');
 const httpServer = createServer(app);
@@ -16,10 +19,15 @@ const io = new Server(httpServer, {
     }
 });
 
-// socket authorization verifier
+//Хранилище данных о состоянии пользователей
+let jwtUser = null;
+const socketUsers = {};
+
+// Проверка авторизации
 io.use(function(socket, next){
     try{
-        if(jwt.verify(socket.handshake.query.token, process.env.JWT_KEY)){
+        jwtUser = jwt.verify(socket.handshake.query.token, process.env.JWT_KEY);
+        if(jwtUser){
             next();
         }else{
             next(new Error('not authorized'));
@@ -29,10 +37,15 @@ io.use(function(socket, next){
     }
 })
 
-io.on('connection', (socket) => {
-    console.log('Got connect');
-    socket.on('emit_method', (msg) => {
-        console.log('message: ' + msg);
+//Соединение пользователей онлайн и обработчики событий
+io.on(CONNECT, (socket) => {
+    socketUsers[socket.id] = jwtUser;
+    socket.emit(SOCKET_USERS_CHANGES, socketUsers);
+
+    //Разрыв соединения сокета и удаления пользователя из списка онлайн
+    socket.on(DISCONNECT, () => {
+        delete socketUsers[socket.id];
+        socket.emit(SOCKET_USERS_CHANGES, socketUsers);
     });
 });
 
