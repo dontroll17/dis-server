@@ -16,6 +16,9 @@ const User = db.define('User', {
     password: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    room_id: {
+        type: DataTypes.STRING
     }
 }, {
     timestamps: false

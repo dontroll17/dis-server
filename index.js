@@ -5,9 +5,11 @@ const app = express();
 const PORT = process.env.PORT || 5555;
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const { randomUUID } = require('crypto');
+const User = require('./src/models/User');
 
 //Константы
-const {CONNECT, DISCONNECT, SOCKET_USERS_CHANGES, INVITE_USER} = require("./src/constants/socketEvents");
+const {CONNECT, DISCONNECT, SOCKET_USERS_CHANGES, INVITE_USER, NEW_INVITE} = require("./src/constants/socketEvents");
 
 //socket.io инициация
 const { createServer } = require("http");
@@ -19,9 +21,12 @@ const io = new Server(httpServer, {
     }
 });
 
-//Хранилище данных о состоянии пользователей
+// Хранилище данных о состоянии пользователей
 let jwtUser = null;
 const socketUsers = {};
+
+// Хранилище данных о комнатах
+const socketRooms = {};
 
 // Проверка авторизации
 io.use(function(socket, next){
@@ -38,14 +43,19 @@ io.use(function(socket, next){
 })
 
 //Соединение пользователей онлайн и обработчики событий
-io.on(CONNECT, (socket) => {
-    socketUsers[socket.id] = jwtUser;
+io.on(CONNECT, async (socket) => {
+    socketUsers[socket.id] = await User.findByPk(jwtUser.id);
     io.emit(SOCKET_USERS_CHANGES, socketUsers);
 
     socket.on(INVITE_USER, (userId) => {
-        let val = Object.values(socketUsers).find((user) => user.id === userId);
-        const client = Object.keys(socketUsers).find(key => socketUsers[key] === val);
-        socket.to(client).emit('hi')
+        let invitedUser = Object.values(socketUsers).find((user) => user.id === userId);
+        const clientId = Object.keys(socketUsers).find(key => socketUsers[key] === invitedUser);
+        let uuid = randomUUID();
+        socketUsers[socket.id].room_id = uuid;
+        socketUsers[socket.id].save();
+        socket.join(uuid);
+        console.log(socketUsers);
+        socket.to(clientId).emit(NEW_INVITE, { uuid });
     })
 
     //Разрыв соединения сокета и удаления пользователя из списка онлайн
