@@ -1,19 +1,20 @@
-const express = require('express');
-const bodyParser = require("body-parser");
-const authRouter = require('./src/routes/auth');
+import express from 'express';
+import bodyParser from 'body-parser';
+import authRouter from './src/routes/auth.js';
+import cors from 'cors';
+import jwt from 'jsonwebtoken';
+import { randomUUID } from 'crypto';
+import User from './src/models/User.js';
+
 const app = express();
 const PORT = process.env.PORT || 5555;
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const { randomUUID } = require('crypto');
-const User = require('./src/models/User');
 
 //Константы
-const {CONNECT, DISCONNECT, SOCKET_USERS_CHANGES, INVITE_USER, NEW_INVITE} = require("./src/constants/socketEvents");
+import {CONNECT, DISCONNECT, SOCKET_USERS_CHANGES, INVITE_USER, NEW_INVITE} from './src/constants/socketEvents.js';
 
 //socket.io инициация
-const { createServer } = require("http");
-const { Server } = require('socket.io');
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {

@@ -1,7 +1,5 @@
-module.exports = {
-    CONNECT: 'connection',
-    DISCONNECT: 'disconnect',
-    SOCKET_USERS_CHANGES: 'socket_users_changes',
-    INVITE_USER: 'invite_user',
-    NEW_INVITE: 'new_invite'
-}
+export const CONNECT = 'connection';
+export const DISCONNECT = 'disconnect';
+export const SOCKET_USERS_CHANGES = 'socket_users_changes';
+export const INVITE_USER = 'invite_user';
+export const NEW_INVITE = 'new_invite';

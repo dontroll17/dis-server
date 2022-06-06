@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const db = require('../config/dbConfig');
+import { DataTypes } from 'sequelize';
+import db from '../config/dbConfig.js';
 
 const User = db.define('User', {
     id: {
@@ -26,4 +26,4 @@ const User = db.define('User', {
 
 User.sync().then(() => console.log('User model sync'));
 
-module.exports = User;
+export default User;
